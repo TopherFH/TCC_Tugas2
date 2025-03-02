@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Notes</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-book"></i> Daily Notes</h1>
+        
+        <div id="notesList" class="notes-list"></div>
+        
+        <a href="index.html" class="back-home">Back to Input</a>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/users';
+
+        async function fetchNotes() {
+            const response = await fetch(API_URL);
+            const notes = await response.json();
+            
+            const notesList = document.getElementById('notesList');
+            notesList.innerHTML = '';
+
+            notes.forEach((note, index) => {
+                notesList.innerHTML += `
+                    <div class="note colorful-note" style="background: ${index % 2 === 0 ? '#ffeb3b' : '#4caf50'}; color: ${index % 2 === 0 ? '#000' : '#fff'};">
+                        <h3>${note.name}</h3>
+                        <p>${note.notes}</p>
+                        <button onclick="editNote(${note.id}, '${note.name}', '${note.notes}')">Edit</button>
+                        <button onclick="deleteNote(${note.id})">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        function editNote(id, name, notes) {
+            window.location.href = `index.html?edit=true&id=${id}&name=${name}&notes=${notes}`;
+        }
+
+        async function deleteNote(id) {
+            await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
+            });
+            fetchNotes();
+        }
+
+        fetchNotes();
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #a18cd1, #fbc2eb);
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            color: #673ab7;
+        }
+
+        .colorful-note {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 5px solid white;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #e91e63;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+    </style>
+</body>
+</html>
